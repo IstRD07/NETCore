@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyWebAPI.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -12,6 +13,7 @@ namespace MyWebAPI.Controllers
     [Route("api/[controller]")]
     public class ToDosController : Controller
     {
+
         ToDosContext db;
 
         public ToDosController(ToDosContext context) {
@@ -26,9 +28,9 @@ namespace MyWebAPI.Controllers
             }
         }
 
-        public ToDosController()
-        {
-        }
+        //public ToDosController()
+        //{
+        //}
 
         // GET: api/<controller>
         [HttpGet]
@@ -42,38 +44,38 @@ namespace MyWebAPI.Controllers
         public IActionResult Get(int id)
         {
             ToDo todo = db.ToDos.FirstOrDefault(x => x.ID == id);
-            return new ObjectResult(todo);
+            return Ok(todo);
         }
 
         // POST api/<controller>
         [HttpPost]
-        public IActionResult Post([FromBody]ToDo todo)
+        public ToDo Post([FromBody]ToDo todo)
         {
-            if (todo == null)
-            {
-                return BadRequest();
-            }
+            //if (todo == null)
+            //{
+            //    return BadRequest();
+            //}
             db.ToDos.Add(todo);
             db.SaveChanges();
-            return Ok(todo);
+            return todo;
         }
 
         // PUT api/<controller>/5
         [HttpPut]
-        public IActionResult Put([FromBody]ToDo todo)
+        public ToDo Put([FromBody]ToDo todo)
         {
-            if (todo == null)
-            {
-                return BadRequest();
-            }
-            if (!db.ToDos.Any(x => x.ID == todo.ID))
-            {
-                return NotFound();
-            }
+            //if (todo == null)
+            //{
+            //    return BadRequest();
+            //}
+            //if (!db.ToDos.Any(x => x.ID == todo.ID))
+            //{
+            //    return NotFound();
+            //}
 
             db.Update(todo);
             db.SaveChanges();
-            return Ok(todo);
+            return todo;
         }
 
         // DELETE api/<controller>/5
@@ -86,7 +88,7 @@ namespace MyWebAPI.Controllers
                 return NotFound();
             }
             db.ToDos.Remove(todo);
-            db.SaveChanges();
+            db.SaveChanges();           
             return Ok(todo);
         }
     }
