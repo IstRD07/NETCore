@@ -35,33 +35,19 @@ namespace MyWebAPITest
         public void TestGetId()
         {
             ToDosController control = new ToDosController(dbContext);
-            var res = control.Get(3);
-            //var viewResult = Assert.IsType<ViewResult>(res);
-            //var model = Assert.IsType<ToDo>(viewResult.ViewData.Model);
-            //Assert.Equal(3, res.ID);
-            var okObjectResult = res as OkObjectResult;
-            Assert.NotNull(okObjectResult);
+            var res = (control.Get(3) as OkObjectResult).Value as ToDo;
+            Assert.Equal(3, res.ID);
 
-            var model = okObjectResult.Value as ToDo;
-            Assert.NotNull(model);
-
-            var res2 = control.Get(777);
-            var okObjectResult2 = res2 as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-
-            var model2 = okObjectResult.Value as ToDo;
-            Assert.NotNull(model);
-
-            //var actual = model.Description;
-            //Assert.Equal(expected, actual);
+            res = (control.Get(777) as OkObjectResult).Value as ToDo;
+            Assert.Null(res);
         }
 
         [Fact]
         public void TestPost()
         {
             ToDosController control = new ToDosController(dbContext);
-            var res = control.Post(new ToDo("test post", false));
-            Assert.Equal(1, 1);
+            var res = (control.Post(new ToDo("test post", false)) as OkObjectResult).Value as ToDo;
+            Assert.Equal(new ToDo("test post", false).Name, res.Name);            
         }
 
         [Fact]
@@ -76,11 +62,10 @@ namespace MyWebAPITest
         public void TestDelete()
         {
             ToDosController control = new ToDosController(dbContext);
-            var res = control.Delete(1) as OkObjectResult;
-            //var viewResult = Assert.IsType<ViewResult>(res);
-
-            
-            Assert.Equal(1, 1);
+            var res = control.Delete(4) as OkObjectResult;
+            Assert.NotNull(res);
+            res = control.Delete(777) as OkObjectResult;
+            Assert.Null(res);
         }
     }
 }

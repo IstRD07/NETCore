@@ -13,7 +13,6 @@ namespace MyWebAPI.Controllers
     [Route("api/[controller]")]
     public class ToDosController : Controller
     {
-
         ToDosContext db;
 
         public ToDosController(ToDosContext context) {
@@ -27,10 +26,6 @@ namespace MyWebAPI.Controllers
                 db.SaveChanges();
             }
         }
-
-        //public ToDosController()
-        //{
-        //}
 
         // GET: api/<controller>
         [HttpGet]
@@ -49,33 +44,33 @@ namespace MyWebAPI.Controllers
 
         // POST api/<controller>
         [HttpPost]
-        public ToDo Post([FromBody]ToDo todo)
+        public IActionResult Post([FromBody]ToDo todo)
         {
-            //if (todo == null)
-            //{
-            //    return BadRequest();
-            //}
+            if (todo == null)
+            {
+                return BadRequest();
+            }
             db.ToDos.Add(todo);
             db.SaveChanges();
-            return todo;
+            return Ok(todo);
         }
 
         // PUT api/<controller>/5
         [HttpPut]
-        public ToDo Put([FromBody]ToDo todo)
+        public IActionResult Put([FromBody]ToDo todo)
         {
-            //if (todo == null)
-            //{
-            //    return BadRequest();
-            //}
-            //if (!db.ToDos.Any(x => x.ID == todo.ID))
-            //{
-            //    return NotFound();
-            //}
+            if (todo == null)
+            {
+                return BadRequest();
+            }
+            if (!db.ToDos.Any(x => x.ID == todo.ID))
+            {
+                return NotFound();
+            }
 
             db.Update(todo);
             db.SaveChanges();
-            return todo;
+            return Ok(todo);
         }
 
         // DELETE api/<controller>/5
