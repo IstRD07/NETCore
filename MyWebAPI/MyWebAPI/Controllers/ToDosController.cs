@@ -29,15 +29,27 @@ namespace MyWebAPI.Controllers
 
         // GET: api/<controller>
         [HttpGet]
-        public IEnumerable<ToDo> Get()
+        public IActionResult Get()
         {
-            return db.ToDos.ToList();
+            if (!db.ToDos.Any())
+            {
+                return NotFound();
+            }
+            return Ok(db.ToDos.ToList());
         }
 
         // GET api/<controller>/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
+            if (id == default(int) || id.GetTypeCode() != (TypeCode)9)
+            {
+                return BadRequest();
+            }
+            if (!db.ToDos.Any())
+            {
+                return NotFound();
+            }
             ToDo todo = db.ToDos.FirstOrDefault(x => x.ID == id);
             return Ok(todo);
         }
@@ -45,8 +57,8 @@ namespace MyWebAPI.Controllers
         // POST api/<controller>
         [HttpPost]
         public IActionResult Post([FromBody]ToDo todo)
-        {
-            if (todo == null)
+        {            
+            if (todo == null || todo.Name.GetTypeCode() != (TypeCode)18 || todo.Name == "")
             {
                 return BadRequest();
             }
@@ -59,7 +71,7 @@ namespace MyWebAPI.Controllers
         [HttpPut]
         public IActionResult Put([FromBody]ToDo todo)
         {
-            if (todo == null)
+            if (todo == null || todo.Name.GetTypeCode() != (TypeCode)18 || todo.Name == "")
             {
                 return BadRequest();
             }
@@ -77,6 +89,10 @@ namespace MyWebAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            if (id == default(int) || id.GetTypeCode() != (TypeCode)9)
+            {
+                return BadRequest();
+            }
             ToDo todo = db.ToDos.FirstOrDefault(x => x.ID == id);
             if (todo == null)
             {

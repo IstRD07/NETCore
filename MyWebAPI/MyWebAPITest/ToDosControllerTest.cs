@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using MyWebAPI.Controllers;
 using MyWebAPI.Models;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
 using Xunit;
 
 namespace MyWebAPITest
@@ -24,10 +27,7 @@ namespace MyWebAPITest
         public void TestGet()
         {
             ToDosController control = new ToDosController(dbContext);
-            var res = control.Get();
-            //var viewResult = Assert.IsType<ViewResult>(res);
-           
-            //var model = Assert.IsType<ToDo>(viewResult.ViewData.Model);
+            var res = control.Get();      
             Assert.NotNull(res);
         }
 
@@ -35,36 +35,37 @@ namespace MyWebAPITest
         public void TestGetId()
         {
             ToDosController control = new ToDosController(dbContext);
-            var res = (control.Get(3) as OkObjectResult).Value as ToDo;
-            Assert.Equal(3, res.ID);
-
-            res = (control.Get(777) as OkObjectResult).Value as ToDo;
+            int id = dbContext.ToDos.LastOrDefault().ID;
+            ToDo res = (control.Get(id) as OkObjectResult).Value as ToDo;
+            Assert.Equal(id, res.ID);
+            res = (control.Get(++id) as OkObjectResult).Value as ToDo;
             Assert.Null(res);
         }
 
         [Fact]
         public void TestPost()
         {
-            ToDosController control = new ToDosController(dbContext);
-            var res = (control.Post(new ToDo("test post", false)) as OkObjectResult).Value as ToDo;
-            Assert.Equal(new ToDo("test post", false).Name, res.Name);            
+            ToDosController control = new ToDosController(dbContext);            
+            var res = (control.Post(new ToDo("test post", false)) as OkObjectResult).Value as ToDo;            
+            Assert.NotNull(res);          
         }
 
         [Fact]
         public void TestPut()
         {
-            ToDosController control = new ToDosController(dbContext);
-            var res = control.Put(new ToDo("test post", true));
-            Assert.Equal(1, 1);
+            ToDosController control = new ToDosController(dbContext);            
+            var res = (control.Put(new ToDo { ID = 7, Name = "test put", Status = false }) as ObjectResult).Value as ToDo;
+            Assert.NotNull(res);
         }
 
         [Fact]
         public void TestDelete()
         {
             ToDosController control = new ToDosController(dbContext);
-            var res = control.Delete(4) as OkObjectResult;
+            int id = dbContext.ToDos.LastOrDefault().ID;
+            var res = control.Delete(id) as OkObjectResult;
             Assert.NotNull(res);
-            res = control.Delete(777) as OkObjectResult;
+            res = control.Delete(++id) as OkObjectResult;
             Assert.Null(res);
         }
     }
