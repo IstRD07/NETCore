@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using MyWebAPI.Models;
+using MyWebAPI.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,29 +9,22 @@ namespace MyWebAPI.Controllers
     [Route("api/[controller]")]
     public class ToDosController : Controller
     {
-        ToDosContext db;
+        private readonly ToDosService _todoService;
 
-        public ToDosController(ToDosContext context) {
-            this.db = context;
-            if (!db.ToDos.Any()) {
-                db.ToDos.Add(new ToDo("Task 1"));
-                db.ToDos.Add(new ToDo("Task 2"));
-                db.ToDos.Add(new ToDo("Task 3"));
-                db.ToDos.Add(new ToDo("Task 4"));
-                db.ToDos.Add(new ToDo("Task 5"));
-                db.SaveChanges();
-            }
+        public ToDosController(ToDosService todoService)
+        {
+            _todoService = todoService;
         }
-
-        // GET: api/<controller>
+            // GET: api/<controller>
         [HttpGet]
         public IActionResult Get()
         {
-            if (!db.ToDos.Any())
+            var res = _todoService.GetToDo();
+            if (res == null)
             {
                 return NotFound();
             }
-            return Ok(db.ToDos.ToList());
+            return Ok(res);
         }
 
         // GET api/<controller>/5
@@ -46,42 +35,34 @@ namespace MyWebAPI.Controllers
             {
                 return BadRequest();
             }
-            ToDo todo = db.ToDos.FirstOrDefault(x => x.ID == id);
-            if (!db.ToDos.Any() || todo == null)
+            var res = _todoService.GetToDoByID(id);
+            if (res == null)
             {
                 return NotFound();
             }            
-            return Ok(todo);
+            return Ok(res);
         }
 
         // POST api/<controller>
         [HttpPost]
         public IActionResult Post([FromBody]ToDo todo)
-        {            
-            if (todo == null || !(todo.Name is string) || todo.Name == "")
+        {
+            var res = _todoService.PostToDo(todo);
+            if (res == null)
             {
                 return BadRequest();
-            }
-            db.ToDos.Add(todo);
-            db.SaveChanges();
-            return Ok(todo);
+            }            
+            return Ok(res);
         }
 
         // PUT api/<controller>/5
         [HttpPut]
         public IActionResult Put([FromBody]ToDo todo)
         {
-            if (todo == null || !(todo.Name is string) || todo.Name == "")
-            {
+            var res = _todoService.PutToDo(todo);
+            if (res == null) {
                 return BadRequest();
             }
-            if (!db.ToDos.Any(x => x.ID == todo.ID))
-            {
-                return NotFound();
-            }
-
-            db.Update(todo);
-            db.SaveChanges();
             return Ok(todo);
         }
 
@@ -93,14 +74,12 @@ namespace MyWebAPI.Controllers
             {
                 return BadRequest();
             }
-            ToDo todo = db.ToDos.FirstOrDefault(x => x.ID == id);
-            if (todo == null)
+            var res = _todoService.DeleteToDo(id);            
+            if (res == false)
             {
-                return NotFound();
-            }
-            db.ToDos.Remove(todo);
-            db.SaveChanges();           
-            return Ok(todo);
+                return BadRequest();
+            }                      
+            return Ok(res);
         }
     }
 }
